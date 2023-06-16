@@ -1,6 +1,9 @@
-import React from "react";
+/** @format */
 
-function QuestionItem({ question }) {
+import React from "react";
+import url from "../constant";
+
+function QuestionItem({ question, onDeletedQuestion }) {
   const { id, prompt, answers, correctIndex } = question;
 
   const options = answers.map((answer, index) => (
@@ -9,15 +12,27 @@ function QuestionItem({ question }) {
     </option>
   ));
 
+  const handleAnswerQuestion = async (selection, id) => {
+    const config = {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ correctIndex: parseInt(selection) }),
+    };
+
+    await fetch(`${url.questions}/${id}`, config);
+  };
+
   return (
     <li>
       <h4>Question {id}</h4>
       <h5>Prompt: {prompt}</h5>
       <label>
         Correct Answer:
-        <select defaultValue={correctIndex}>{options}</select>
+        <select onChange={(e) => handleAnswerQuestion(e.target.value, id)} defaultValue={correctIndex}>
+          {options}
+        </select>
       </label>
-      <button>Delete Question</button>
+      <button onClick={() => onDeletedQuestion(id)}>Delete Question</button>
     </li>
   );
 }
